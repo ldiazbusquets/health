@@ -134,13 +134,13 @@
 
   // the LDB HEALTH wordmark: wordmark.js runs the particles, this canvas draws them at the back of the depth range,
   // so the heart's silhouette always covers them. Two passes: soft gaussian sprites (out of focus), then sharp squares.
-  var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr, uG; uniform mediump float uBlur, uMode; varying mediump float vA;',
-    'void main() { vA = aP.w; gl_Position = vec4(mix(uRect.x, uRect.z, aP.x / uWH.x), mix(uRect.y, uRect.w, aP.y / uWH.y), 0.99, 1.0);',
-    '  gl_PointSize = uMode < 0.5 ? (uG + uBlur * 3.0) * uDpr : max(1.0, uG * aP.z * uDpr); }'].join('\n');
-  var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur; varying float vA;',
+  var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr, uG; uniform mediump float uBlur, uMode; varying mediump float vA, vS;',
+    'void main() { vA = fract(aP.z); vS = aP.w; gl_Position = vec4(mix(uRect.x, uRect.z, aP.x / uWH.x), mix(uRect.y, uRect.w, aP.y / uWH.y), 0.99, 1.0);',
+    '  gl_PointSize = uMode < 0.5 ? (uG + uBlur * 7.0) * uDpr : max(1.0, uG * floor(aP.z) / 100.0 * uDpr); }'].join('\n');
+  var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur; varying float vA, vS;',
     'void main() { float a;',
-    '  if (uMode < 0.5) { vec2 d = gl_PointCoord - 0.5; a = uCol.a * exp(-dot(d, d) * 9.0) * clamp(2.6 / uBlur, 0.35, 1.0); }',
-    '  else { a = vA; if (a < 0.03) discard; }',
+    '  if (uMode < 0.5) { vec2 d = gl_PointCoord - 0.5; a = uCol.a * vA * exp(-dot(d, d) * 18.0) * clamp(2.6 / uBlur, 0.35, 1.0); if (a < 0.002) discard; }',
+    '  else { a = vS; if (a < 0.03) discard; }',
     '  gl_FragColor = vec4(uCol.rgb * a, a); }'].join('\n');
   var wmCv = document.getElementById('wordmark'), progQ = null, UQ = {}, wmN = 0;
   function drawWordmark() {
