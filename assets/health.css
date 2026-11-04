@@ -60,7 +60,6 @@ html.lt .sites { background: rgba(255,255,255,.5); border-color: rgba(60,20,24,.
 .tbtn svg { width: 16px; height: 16px; display: block; } .tbtn .sun { display: none; }
 html.lt .tbtn .sun { display: block; } html.lt .tbtn .moon { display: none; }
 html.lt .tbtn { background: rgba(255,255,255,.5); border-color: rgba(60,20,24,.14); }
-@media (max-width: 1240px) { .hr .gh { display: none; } }
 @media (max-width: 1100px) { .sites .opt { display: none; } }
 @media (max-width: 960px) { .nav { gap: 20px; } }
 @media (max-width: 820px) {
