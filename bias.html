@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Algorithm Bias | LDB Health</title>
+<meta name="description" content="Train a clinical risk model on unbalanced data and see which group it fails. Synthetic data, real logistic regression, in your browser.">
+<meta property="og:title" content="Algorithm Bias | LDB Health">
+<meta property="og:description" content="A risk model trained mostly on one group quietly fails another. Change the training data and see who the model misses.">
+<meta property="og:image" content="https://ldiazbusquets.github.io/health/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#8C343B">
+<script src="assets/theme.js"></script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/health.css">
+<style>
+  #plot { height: clamp(320px, 34vw, 430px); }
+  .bars .br { margin: 12px 0; }
+  .bars .br div { display: flex; justify-content: space-between; font-size: 13px; color: var(--t2); margin-bottom: 6px; }
+  .bars .br div b { font: 400 12.5px var(--mono); color: var(--ink); }
+  .bars .br i { display: block; height: 6px; border-radius: 3px; transition: width .6s cubic-bezier(.2,.7,.2,1); }
+  .bars .track { background: var(--s3); border-radius: 3px; }
+  .two-b { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 700px) { .two-b { grid-template-columns: minmax(0, 1fr); } }
+  .toggle { display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 13.5px; color: var(--t2); cursor: pointer; }
+  .toggle input { accent-color: var(--acc2); width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="w">
+  <a class="logo" href="./" aria-label="LDB Health home"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9.5V4.8A1.8 1.8 0 0 1 4.8 3h4.7M14.5 21h4.7a1.8 1.8 0 0 0 1.8-1.8v-4.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 9.2v5.6M9.2 12h5.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg> LDB <span>Health</span><span class="crumb">Workbenches</span></a>
+  <span></span>
+  <div class="hr">
+    <button class="tbtn" type="button" id="themeBtn" aria-label="Switch between light and dark"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>
+    <a class="pill gl sm" href="./#tools">&larr; Workbenches</a>
+  </div>
+</div></header>
+
+<main>
+<section class="page-top"><div class="w">
+  <span class="lbl">FAIR-01 · Fairness</span>
+  <h1>Algorithm Bias</h1>
+  <p class="lead">A hospital trains a model to flag patients at risk from a blood marker and a symptom score. In group B, the marker reads lower for the same illness, much as some real devices read differently across patients. If the training data is mostly group A, the model learns group A's pattern.</p>
+
+  <div class="dash">
+    <div class="dgrid">
+      <div class="side">
+        <div class="panel ctl">
+          <h4>The training data <span>synthetic</span></h4>
+          <label for="share">Group B's share of training data <b id="shareV"></b></label>
+          <input type="range" id="share" min="2" max="50" step="1">
+          <label for="shift">How much lower B's marker reads <b id="shiftV"></b></label>
+          <input type="range" id="shift" min="0" max="100" step="1">
+          <p class="hint">0 means the marker behaves the same in both groups.</p>
+          <label for="thr">Flag patients above risk <b id="thrV"></b></label>
+          <input type="range" id="thr" min="5" max="95" step="1">
+          <p class="hint">Lower catches more sick patients but raises false alarms.</p>
+          <label class="toggle"><input type="checkbox" id="fix"> Let the model account for the group</label>
+          <p class="hint">Gives the model the group as an input so it can learn B's offset. It fixes the numbers here, but using group membership raises its own questions.</p>
+        </div>
+        <div class="panel">
+          <h4>Model <span id="trainNote"></span></h4>
+          <p class="nt" style="margin:0;color:var(--t2);font-size:13px" id="eq"></p>
+        </div>
+      </div>
+      <div class="side">
+        <div class="panel"><p class="say" id="say"></p></div>
+        <div class="panel">
+          <h4>Test patients, 600 per group <span>filled: sick · hollow: healthy</span></h4>
+          <canvas id="plot" class="cv" role="img" aria-label="Scatter of test patients with the model's decision line"></canvas>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="two-b">
+          <div class="panel bars"><h4>Sick patients caught <span>sensitivity</span></h4><div id="sensBars"></div></div>
+          <div class="panel bars"><h4>Healthy patients flagged <span>false alarms</span></h4><div id="fprBars"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="explain">
+    <div><h3>Bias without intent</h3><p>Nobody told this model to treat the groups differently. It learned one decision line from data that was mostly group A, and that line sits in the wrong place for group B.</p></div>
+    <div><h3>Overall accuracy hides it</h3><p>Because group A dominates, the model can look accurate overall while missing many sick patients in group B. Fairness checks report error rates for each group separately.</p></div>
+    <div><h3>It happens in practice</h3><p>A widely used US care-management algorithm underestimated Black patients' needs because it predicted cost rather than illness (Obermeyer et al., Science, 2019). Pulse oximeters missed low oxygen more often in Black patients (Sjoding et al., NEJM, 2020).</p></div>
+  </div>
+  <p class="src">All patients here are synthetic: generated in your browser from made-up distributions. The model is a real logistic regression trained by gradient descent each time you change a setting. Sources: <a href="https://www.science.org/doi/10.1126/science.aax2342" rel="noopener">Obermeyer et al., Science (2019)</a>; <a href="https://www.nejm.org/doi/full/10.1056/NEJMc2029240" rel="noopener">Sjoding et al., NEJM (2020)</a>. Educational only; not medical advice.</p>
+</div></section>
+</main>
+
+<footer class="mini"><div class="w">
+  <div class="fbar"><span><a href="./">&larr; LDB Health</a></span><span>&copy; <span id="yr"></span> Luis Diaz Busquets</span><span>Educational only. Not medical advice.</span></div>
+</div></footer>
+
+<script src="assets/site.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var st = { share: 10, shift: 60, thr: 50, fix: false };
+  ['share', 'shift', 'thr'].forEach(function (k) { $(k).value = st[k]; $(k).oninput = function () { st[k] = +this.value; if (k !== 'thr') retrain(); draw(); }; });
+  $('fix').onchange = function () { st.fix = this.checked; retrain(); draw(); };
+
+  // seeded random numbers so the same settings always give the same patients
+  function rng(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
+  function gauss(r) { return Math.sqrt(-2 * Math.log(r() + 1e-12)) * Math.cos(2 * Math.PI * r()); }
+  // one patient: marker (x) and symptom score (y); sick raises both; group B's marker reads lower
+  function patient(r, b, shift) {
+    var sick = r() < 0.35;
+    var x = (sick ? 1.0 : -0.6) + gauss(r) * 0.75 - (b ? shift : 0);
+    var y = (sick ? 0.55 : -0.35) + gauss(r) * 0.9;
+    return { x: x, y: y, b: b, sick: sick };
+  }
+  function makeSet(seed, nA, nB, shift) { var r = rng(seed), out = [], i; for (i = 0; i < nA; i++) out.push(patient(r, 0, shift)); for (i = 0; i < nB; i++) out.push(patient(r, 1, shift)); return out; }
+
+  var w = [0, 0, 0, 0], train = [], test = [];
+  function feats(p) { return [1, p.x, p.y, st.fix ? p.b : 0]; }
+  function prob(p) { var f = feats(p), z = 0; for (var i = 0; i < 4; i++) z += w[i] * f[i]; return 1 / (1 + Math.exp(-z)); }
+  function retrain() {
+    var shift = st.shift / 100 * 1.8, n = 2000, nB = Math.round(n * st.share / 100);
+    train = makeSet(101, n - nB, nB, shift); test = makeSet(202, 600, 600, shift);
+    w = [0, 0, 0, 0];
+    for (var it = 0; it < 400; it++) {   // full-batch gradient descent on log loss
+      var g = [0, 0, 0, 0];
+      for (var i = 0; i < train.length; i++) { var p = train[i], e = prob(p) - (p.sick ? 1 : 0), f = feats(p); for (var j = 0; j < 4; j++) g[j] += e * f[j]; }
+      for (j = 0; j < 4; j++) w[j] -= 0.8 * g[j] / train.length;
+    }
+    $('trainNote').textContent = 'trained on ' + n.toLocaleString() + ' patients';
+  }
+  function rates(group) {
+    var t = st.thr / 100, tp = 0, fn = 0, fp = 0, tn = 0;
+    test.forEach(function (p) { if (p.b !== group) return; var flag = prob(p) >= t; if (p.sick) { if (flag) tp++; else fn++; } else { if (flag) fp++; else tn++; } });
+    return { sens: tp / (tp + fn), fpr: fp / (fp + tn), acc: (tp + tn) / (tp + fn + fp + tn), fn: fn, sick: tp + fn };
+  }
+  function pct(x) { return Math.round(x * 100) + '%'; }
+  function fit(cv) { var r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); cv.width = r.width * d; cv.height = r.height * d; var c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0); return { c: c, W: r.width, H: r.height }; }
+
+  function draw() {
+    var C = window.ldbColors(), A = rates(0), B = rates(1);
+    $('shareV').textContent = st.share + '%'; $('shiftV').textContent = st.shift + '%'; $('thrV').textContent = st.thr + '%';
+    var all = rates(0), overall = (A.acc + B.acc) / 2;
+    var gap = A.sens - B.sens;
+    $('say').innerHTML = 'The model catches <b>' + pct(A.sens) + '</b> of sick patients in group A but <b>' + pct(B.sens) + '</b> in group B' +
+      (gap > 0.08 ? ', so about <b>' + B.fn + ' of ' + B.sick + '</b> sick group B patients go unflagged. Overall accuracy still looks like <b>' + pct(overall) + '</b>.' : gap < -0.08 ? '. Group B is now caught more often than group A.' : '. The two groups are treated about the same.');
+    $('eq').textContent = 'risk = σ(' + w[0].toFixed(2) + ' + ' + w[1].toFixed(2) + '·marker + ' + w[2].toFixed(2) + '·symptoms' + (st.fix ? ' + ' + w[3].toFixed(2) + '·groupB' : '') + ')';
+    var colA = C.acc2, colB = C.blue;
+    function bars(id, key, good) {
+      $(id).innerHTML = [['Group A', A[key], colA], ['Group B', B[key], colB]].map(function (q) {
+        return '<div class="br"><div><span>' + q[0] + '</span><b>' + pct(q[1]) + '</b></div><div class="track"><i style="width:' + (q[1] * 100).toFixed(1) + '%;background:' + q[2] + '"></i></div></div>'; }).join('');
+    }
+    bars('sensBars', 'sens'); bars('fprBars', 'fpr');
+
+    // scatter with the decision line(s): w0 + w1 x + w2 y (+ w3 b) = logit(threshold)
+    var g = fit($('plot')), c = g.c, W = g.W, H = g.H, pad = 30;
+    var xr = [-4.2, 3.4], yr = [-3.2, 3.6];
+    var X = function (x) { return pad + (x - xr[0]) / (xr[1] - xr[0]) * (W - pad * 1.5); }, Y = function (y) { return H - pad - (y - yr[0]) / (yr[1] - yr[0]) * (H - pad * 1.6); };
+    c.clearRect(0, 0, W, H);
+    c.font = '10.5px "Geist Mono", monospace'; c.fillStyle = C.t3; c.fillText('blood marker →', W - 120, H - 8); c.save(); c.translate(12, pad + 90); c.rotate(-Math.PI / 2); c.fillText('symptom score →', 0, 0); c.restore();
+    test.forEach(function (p) {
+      var x = X(p.x), y = Y(p.y); if (x < pad - 4 || x > W || y < 0 || y > H - pad + 4) return;
+      c.strokeStyle = p.b ? colB : colA; c.fillStyle = p.b ? colB : colA; c.globalAlpha = p.sick ? 0.85 : 0.55; c.lineWidth = 1.1;
+      c.beginPath(); c.arc(x, y, p.sick ? 3 : 2.6, 0, 7); if (p.sick) c.fill(); else c.stroke();
+    });
+    c.globalAlpha = 1;
+    c.save(); c.beginPath(); c.rect(pad - 6, 6, W - pad, H - pad - 6); c.clip();
+    var L = Math.log(st.thr / (100 - st.thr));
+    function line(bv, col, dash) {
+      if (Math.abs(w[2]) < 1e-6) return; c.strokeStyle = col; c.lineWidth = 2; c.setLineDash(dash || []);
+      c.beginPath(); for (var k = 0; k <= 1; k++) { var x = xr[0] + k * (xr[1] - xr[0]), y = (L - w[0] - w[1] * x - w[3] * bv) / w[2]; if (k) c.lineTo(X(x), Y(y)); else c.moveTo(X(x), Y(y)); } c.stroke(); c.setLineDash([]);
+    }
+    if (st.fix) { line(0, colA, [6, 4]); line(1, colB, [6, 4]); } else line(0, C.ink);
+    c.restore();
+    c.fillStyle = C.t2; c.fillText('flagged ↗', W - 90, 20);
+    $('legend').innerHTML = '<span><i style="background:' + colA + '"></i>Group A</span><span><i style="background:' + colB + '"></i>Group B</span><span><i style="background:' + C.ink + ';height:2px;border-radius:0;vertical-align:3px"></i>' + (st.fix ? 'Dashed: one line per group' : 'Model\'s decision line') + '</span>';
+  }
+  retrain(); draw();
+  addEventListener('resize', function () { clearTimeout(draw.t); draw.t = setTimeout(draw, 120); });
+  addEventListener('themechange', draw);
+  if (document.fonts) document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>

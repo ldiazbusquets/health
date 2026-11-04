@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health | Luis Diaz Busquets</title>
+<meta name="description" content="Interactive tools on how AI is used, tested and trusted in healthcare, built by Luis Diaz Busquets. Everything runs in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LDB Health">
+<meta property="og:title" content="Health | Luis Diaz Busquets">
+<meta property="og:description" content="Interactive tools on how AI is used, tested and trusted in healthcare. Everything runs in your browser.">
+<meta property="og:url" content="https://ldiazbusquets.github.io/health/">
+<meta property="og:image" content="https://ldiazbusquets.github.io/health/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#8C343B">
+<script src="assets/theme.js"></script>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/health.css">
+</head>
+<body>
+
+<header class="top"><div class="w">
+  <a class="logo" href="#top" aria-label="LDB Health, back to top"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9.5V4.8A1.8 1.8 0 0 1 4.8 3h4.7M14.5 21h4.7a1.8 1.8 0 0 0 1.8-1.8v-4.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 9.2v5.6M9.2 12h5.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg> LDB <span>Health</span></a>
+  <nav class="nav" id="nav" aria-label="Sections">
+    <a href="#tools">Workbenches</a>
+    <a href="#course">Course</a>
+    <a href="#index">Index</a>
+    <a href="#about">About</a>
+    <div class="msites"><a href="/">Portfolio</a><a href="/lab/">Lab</a><b aria-current="page">Health</b></div>
+  </nav>
+  <div class="hr">
+    <button class="tbtn" type="button" id="themeBtn" aria-label="Switch between light and dark"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg></button>
+    <a class="pill gl sm gh" href="https://github.com/ldiazbusquets" rel="noopener">GitHub</a>
+    <span class="sites" role="navigation" aria-label="Luis Diaz Busquets sites"><a href="/">Portfolio</a><a class="opt" href="/finance/">Finance</a><a href="/lab/">Lab</a><b aria-current="page">Health</b></span>
+    <button class="pill gl sm menu" type="button" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+  </div>
+</div></header>
+
+<main>
+<section class="hero" id="top" aria-label="Introduction">
+  <canvas id="heart" aria-hidden="true"></canvas>
+  <div class="hcopy">
+    <p class="k">AI in Healthcare · Luis Diaz Busquets</p>
+    <h1><span>Medicine,</span><span>Measured</span><span>By Machines.</span></h1>
+    <p>Interactive tools on how AI is used, tested and trusted in healthcare, all running live in your browser.</p>
+    <div class="cta"><a class="pill lt" href="#tools"><span class="ic"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Explore the Tools</a><a class="pill gl" href="#course">The Course</a></div>
+  </div>
+  <div class="scard" aria-live="polite">
+    <div class="tp"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 17h6l3-7 4 14 4-11 2 4h9" stroke-linecap="round" stroke-linejoin="round"/></svg><button class="nx" type="button" id="nx" aria-label="Next"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    <a class="it" id="it" href="tests.html"><i></i><div><b id="itb">01 / 03 Workbenches</b><span id="its">Why a 99% accurate test can still be wrong most of the time.</span></div></a>
+    <div class="bar" id="bar"><i class="on"></i><i></i><i></i></div>
+  </div>
+</section>
+
+<section class="s" id="tools" aria-label="Workbenches"><div class="w">
+  <div class="shead rv"><div><span class="lbl">Workbenches</span><h2 class="h">See how medical AI <em>gets things right, and wrong.</em></h2><p class="lead">Each one is a working model you can push around. Change a number and watch the consequences, the way a clinician, a regulator or a data scientist would.</p></div></div>
+  <div class="feat rv">
+    <a class="fc" href="tests.html"><div class="im"><canvas data-prev="tests"></canvas><div class="gl"><b>Test 1,000 people</b><span>DX-01 &rarr;</span></div></div><h3>Test Accuracy</h3><p>Sensitivity, specificity and how common a disease is decide what a positive result really means. A 1,000-person grid shows every true and false result.</p></a>
+    <a class="fc" href="outbreak.html"><div class="im"><canvas data-prev="outbreak"></canvas><div class="gl"><b>Run an outbreak</b><span>POP-01 &rarr;</span></div></div><h3>Outbreak Simulator</h3><p>The SEIR model epidemiologists use. Set how contagious a disease is, then try vaccination and distancing and watch the curve and the hospital load change.</p></a>
+    <a class="fc" href="bias.html"><div class="im"><canvas data-prev="bias"></canvas><div class="gl"><b>Train a biased model</b><span>FAIR-01 &rarr;</span></div></div><h3>Algorithm Bias</h3><p>A risk model trained mostly on one group quietly fails another. Change the training data and see who the model misses.</p></a>
+  </div>
+</div></section>
+
+<section class="s" aria-label="Statement"><div class="w rv">
+  <p class="stmt">Accuracy is not one number. <span>It depends on who you test, how common the disease is, and who the model learned from.</span></p>
+</div></section>
+
+<section class="s" id="course" aria-label="The course"><div class="w">
+  <div class="shead rv"><div><span class="lbl">SCI 359 · Spring 2027</span><h2 class="h">AI in Healthcare, <em>one topic at a time.</em></h2><p class="lead">Built alongside the AI in Healthcare course at Bryant University. Topics with a working tool are live; the rest arrive as the semester covers them.</p></div></div>
+  <div class="rows rv" id="rows">
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">01</span><span><span class="ht">Diagnosis and testing</span><span class="pd">What accuracy means for a screening test or a diagnostic model, and why base rates matter.</span></span><span class="st">Live</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><a href="tests.html"><span class="id">DX-01</span><span class="t">Test Accuracy</span><span class="d">Sensitivity, specificity, prevalence, and the positive predictive value they produce.</span><span class="o">Open &rarr;</span></a></li></ul></div></div></div>
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">02</span><span><span class="ht">Population health</span><span class="pd">Modelling how diseases spread and what interventions do to the curve.</span></span><span class="st">Live</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><a href="outbreak.html"><span class="id">POP-01</span><span class="t">Outbreak Simulator</span><span class="d">SEIR compartments, R0, vaccination, distancing and hospital capacity.</span><span class="o">Open &rarr;</span></a></li></ul></div></div></div>
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">03</span><span><span class="ht">Fairness and safety</span><span class="pd">How clinical algorithms inherit bias from their data, and how it is measured.</span></span><span class="st">Live</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><a href="bias.html"><span class="id">FAIR-01</span><span class="t">Algorithm Bias</span><span class="d">Group-by-group error rates of a risk model as its training data changes.</span><span class="o">Open &rarr;</span></a></li></ul></div></div></div>
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">04</span><span><span class="ht">Medical imaging</span><span class="pd">How image models read scans, and how to see what they looked at.</span></span><span class="st soon">Coming</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><div><span class="id">IMG-01</span><span class="t">How AI Reads a Scan</span><span class="d">A small image model on a public research dataset, with a map of the pixels it relied on.</span><span class="o soon">Coming</span></div></li></ul></div></div></div>
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">05</span><span><span class="ht">Clinical language</span><span class="pd">Language models on medical text: summarising, coding and removing identifying details.</span></span><span class="st soon">Coming</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><div><span class="id">NLP-01</span><span class="t">De-identification</span><span class="d">Find and mask names, dates and numbers in a made-up clinical note.</span><span class="o soon">Coming</span></div></li></ul></div></div></div>
+    <div class="rw"><button class="rh" type="button" aria-expanded="false"><span class="n">06</span><span><span class="ht">Class work</span><span class="pd">Assignments and presentations from SCI 359.</span></span><span class="st soon">Spring 2027</span><span class="ar"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <div class="mods"><div><ul><li><div><span class="id">SCI 359</span><span class="t">Projects</span><span class="d">Added as the course goes.</span><span class="o soon">Spring 2027</span></div></li></ul></div></div></div>
+  </div>
+</div></section>
+
+<section class="s" id="index" aria-label="Index"><div class="w">
+  <div class="shead rv"><div><span class="lbl">Index</span><h2 class="h">Everything, <em>in one list.</em></h2></div></div>
+  <table class="cat rv"><thead><tr><th class="id">ID</th><th>Name</th><th>What it does</th><th class="m">Topic</th><th></th></tr></thead><tbody>
+    <tr class="row" data-href="tests.html"><td class="id">DX-01</td><td class="t"><a href="tests.html">Test Accuracy</a></td><td class="d">Sensitivity, specificity and prevalence on a grid of 1,000 people; positive and negative predictive value; a second test.</td><td class="m"><span class="tag">Diagnosis</span></td><td class="go">Open &rarr;</td></tr>
+    <tr class="row" data-href="outbreak.html"><td class="id">POP-01</td><td class="t"><a href="outbreak.html">Outbreak Simulator</a></td><td class="d">An SEIR model with R0, incubation, vaccination, distancing and a hospital capacity line.</td><td class="m"><span class="tag">Epidemiology</span></td><td class="go">Open &rarr;</td></tr>
+    <tr class="row" data-href="bias.html"><td class="id">FAIR-01</td><td class="t"><a href="bias.html">Algorithm Bias</a></td><td class="d">A logistic risk model trained on unbalanced synthetic data, with error rates for each group.</td><td class="m"><span class="tag">Fairness</span></td><td class="go">Open &rarr;</td></tr>
+  </tbody></table>
+</div></section>
+
+<section class="s" id="about" aria-label="About"><div class="w two rv">
+  <div><span class="lbl">About</span><h2 class="h">Why a finance student <em>builds health tools.</em></h2></div>
+  <div>
+    <p>The same questions run through finance and medicine: how much to trust a model, what an error costs, and who carries that cost. This site works through them for healthcare as part of the Applied AI minor at Bryant University.</p>
+    <p>It is a sister site to the <a href="/lab/" style="color:var(--ink);text-decoration:underline;text-underline-offset:3px">LDB Lab</a>, which covers how machine learning works and how it is used in finance. Everything here runs in your browser; nothing you enter is sent anywhere.</p>
+    <div class="note"><b>Educational only.</b> These tools use made-up or illustrative numbers to explain ideas. They are not medical advice and say nothing about any real person's health.</div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="w">
+  <div class="fgrid">
+    <div><p class="big4">Thanks for stopping by. <em>Stay curious, stay well.</em></p><p style="margin-top:16px">Built by Luis Diaz Busquets. Runs entirely in your browser.</p></div>
+    <div><h5>Health</h5><p><a href="#tools">Workbenches</a></p><p><a href="#course">Course</a></p><p><a href="#index">Index</a></p><p><a href="#about">About</a></p></div>
+    <div><h5>Tools</h5><p><a href="tests.html">Test Accuracy</a></p><p><a href="outbreak.html">Outbreak Simulator</a></p><p><a href="bias.html">Algorithm Bias</a></p></div>
+    <div><h5>Elsewhere</h5><p><a href="/">Main site</a></p><p><a href="/lab/">LDB Lab</a></p><p><a href="https://github.com/ldiazbusquets" rel="noopener">GitHub</a></p><p><a href="https://www.linkedin.com/in/luis-diaz-busquets" rel="noopener">LinkedIn</a></p></div>
+  </div>
+  <div class="fbar"><span>No cookies, no tracking</span><span>&copy; <span id="yr"></span> Luis Diaz Busquets</span><span>Educational only. Not medical advice.</span></div>
+</div>
+<div class="wm" aria-hidden="true"><span>ldb health</span></div>
+</footer>
+
+<script src="assets/site.js"></script>
+<script src="assets/heart.js"></script>
+<script>
+(function () {
+  // hero card: cycles through the workbenches
+  var items = [['01 / 03 Workbenches', 'Why a 99% accurate test can still be wrong most of the time.', 'tests.html'],
+               ['02 / 03 Workbenches', 'Flatten an outbreak curve under the hospital line.', 'outbreak.html'],
+               ['03 / 03 Workbenches', 'Watch a model trained on one group miss another.', 'bias.html']], k = 0, timer;
+  function show(i) { k = i; document.getElementById('itb').textContent = items[i][0]; document.getElementById('its').textContent = items[i][1]; document.getElementById('it').href = items[i][2];
+    document.querySelectorAll('#bar i').forEach(function (b, j) { b.classList.toggle('on', j === i); }); }
+  function auto() { clearInterval(timer); timer = setInterval(function () { show((k + 1) % items.length); }, 5000); }
+  document.getElementById('nx').onclick = function () { show((k + 1) % items.length); auto(); }; auto();
+
+  // course rows open and close
+  document.querySelectorAll('.rh').forEach(function (b) { b.onclick = function () { var r = b.parentElement, o = r.classList.toggle('open'); b.setAttribute('aria-expanded', o); }; });
+  // index rows are clickable
+  document.querySelectorAll('tr.row').forEach(function (r) { r.onclick = function (e) { if (!e.target.closest('a')) location.href = r.dataset.href; }; });
+
+  // live previews on the workbench cards
+  function prev() {
+    var C = window.ldbColors();
+    document.querySelectorAll('canvas[data-prev]').forEach(function (cv) {
+      var r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1), W = r.width, H = r.height; if (!W) return;
+      cv.width = W * d; cv.height = H * d; var c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0);
+      c.fillStyle = C.lt ? '#F3E9E9' : '#1A1415'; c.fillRect(0, 0, W, H);
+      var kind = cv.dataset.prev;
+      if (kind === 'tests') {   // 1,000 people: prevalence 2%, sensitivity 90%, specificity 95%
+        var cols = 40, rows = 25, gx = W * 0.84 / cols, ox = (W - gx * cols) / 2, oy = H * 0.12;
+        var cells = []; for (var i = 0; i < 18; i++) cells.push('tp'); cells.push('fn', 'fn'); for (i = 0; i < 49; i++) cells.push('fp'); while (cells.length < 1000) cells.push('tn');
+        var seed = 7; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+        for (i = cells.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)), t = cells[i]; cells[i] = cells[j]; cells[j] = t; }
+        var col = { tp: C.acc2, fn: C.blue, fp: C.lt ? '#E3A9AD' : '#8A4248', tn: C.lt ? '#DCCFD0' : '#3A3031' };
+        cells.forEach(function (k2, n) { c.fillStyle = col[k2]; c.beginPath(); c.arc(ox + (n % cols + .5) * gx, oy + (Math.floor(n / cols) + .5) * gx, gx * 0.34, 0, 7); c.fill(); });
+      } else if (kind === 'outbreak') {   // a quick SEIR run
+        var N = 1, S = .999, E = 0, I = .001, R = 0, b = 2.5 / 7, s2 = 1 / 5, g2 = 1 / 7, pts = [];
+        for (var day = 0; day < 180; day++) { for (var h = 0; h < 4; h++) { var dt = .25, inf = b * S * I; S -= inf * dt; E += (inf - s2 * E) * dt; I += (s2 * E - g2 * I) * dt; R += g2 * I * dt; } pts.push([S, I, R]); }
+        var X = function (i2) { return W * 0.06 + i2 / 179 * W * 0.88; }, Y = function (v) { return H * 0.86 - v * H * 0.7; };
+        [[0, C.blue], [2, C.t3], [1, C.acc2]].forEach(function (q) { c.strokeStyle = q[1]; c.lineWidth = q[0] === 1 ? 2.4 : 1.6; c.beginPath(); pts.forEach(function (p, i2) { var y = Y(q[0] === 1 ? p[1] * 3 : p[q[0]]); if (i2) c.lineTo(X(i2), y); else c.moveTo(X(i2), y); }); c.stroke(); });
+        c.setLineDash([4, 4]); c.strokeStyle = C.ink; c.lineWidth = 1; c.beginPath(); c.moveTo(W * .06, Y(.45)); c.lineTo(W * .94, Y(.45)); c.stroke(); c.setLineDash([]);
+      } else {   // two groups, one threshold
+        var sd = 3; function rn() { sd = (sd * 16807) % 2147483647; return sd / 2147483647; } function gauss() { return Math.sqrt(-2 * Math.log(rn() + 1e-9)) * Math.cos(6.283 * rn()); }
+        for (var n2 = 0; n2 < 260; n2++) { var grpB = n2 % 4 === 0, sick = rn() < .4, x = (sick ? .62 : .38) + gauss() * .12 - (grpB ? .12 : 0), y = .5 + gauss() * .17;
+          c.fillStyle = grpB ? C.blue : C.acc2; c.globalAlpha = sick ? .95 : .35; c.beginPath(); c.arc(W * (.08 + x * .84), H * (.12 + y * .72), 3.2, 0, 7); c.fill(); }
+        c.globalAlpha = 1; c.strokeStyle = C.ink; c.lineWidth = 1.4; c.beginPath(); c.moveTo(W * .56, H * .08); c.lineTo(W * .56, H * .88); c.stroke();
+      }
+    });
+  }
+  addEventListener('load', prev); addEventListener('resize', function () { clearTimeout(prev.t); prev.t = setTimeout(prev, 150); }); addEventListener('themechange', prev);
+})();
+</script>
+</body>
+</html>
