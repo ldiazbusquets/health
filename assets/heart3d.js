@@ -134,7 +134,7 @@
 
   // the LDB HEALTH wordmark: wordmark.js runs the particles, this canvas draws them at the back of the depth range,
   // so the heart's silhouette always covers them. Two passes: soft gaussian sprites (out of focus), then sharp squares.
-  var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr, uG; uniform mediump float uBlur, uMode; varying mediump float vA, vS;',
+  var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr; uniform mediump float uG, uBlur, uMode; varying mediump float vA, vS;',
     'void main() { vA = fract(aP.z); vS = aP.w; gl_Position = vec4(mix(uRect.x, uRect.z, aP.x / uWH.x), mix(uRect.y, uRect.w, aP.y / uWH.y), 0.99, 1.0);',
     '  gl_PointSize = uMode < 0.5 ? (uG + uBlur * 7.0) * uDpr : max(1.0, uG * floor(aP.z) / 100.0 * uDpr); }'].join('\n');
   var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur, uG, uGap; varying float vA, vS;',
