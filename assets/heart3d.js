@@ -132,23 +132,34 @@
   // the invisible depth pass: the solid heart hides the dots on its far side and inside the chambers
   var DEPTH_FS = 'precision mediump float; void main() { gl_FragColor = vec4(0.0); }';
 
-  // the LDB HEALTH wordmark (drawn by wordmark.js on its own canvas) is composited here, behind the heart:
-  // a flat quad at the back of the depth range, so the heart's silhouette always covers it
-  var QVS = 'attribute vec2 aQ; uniform vec4 uRect; varying vec2 vUv; void main() { vUv = vec2(aQ.x, 1.0 - aQ.y); gl_Position = vec4(mix(uRect.x, uRect.z, aQ.x), mix(uRect.w, uRect.y, aQ.y), 0.99, 1.0); }';
-  var QFS = 'precision mediump float; uniform sampler2D uTex; varying vec2 vUv; void main() { gl_FragColor = texture2D(uTex, vUv); }';
-  var wmCv = document.getElementById('wordmark'), progQ = null, UQ = {}, wmTex = null;
+  // the LDB HEALTH wordmark: wordmark.js runs the particles, this canvas draws them at the back of the depth range,
+  // so the heart's silhouette always covers them. Two passes: soft gaussian sprites (out of focus), then sharp squares.
+  var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr, uG, uBlur, uMode; varying float vA;',
+    'void main() { vA = aP.w; gl_Position = vec4(mix(uRect.x, uRect.z, aP.x / uWH.x), mix(uRect.y, uRect.w, aP.y / uWH.y), 0.99, 1.0);',
+    '  gl_PointSize = uMode < 0.5 ? (uG + uBlur * 3.0) * uDpr : max(1.0, uG * aP.z * uDpr); }'].join('\n');
+  var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur; varying float vA;',
+    'void main() { float a;',
+    '  if (uMode < 0.5) { vec2 d = gl_PointCoord - 0.5; a = uCol.a * exp(-dot(d, d) * 9.0) * clamp(2.6 / uBlur, 0.35, 1.0); }',
+    '  else { a = vA; if (a < 0.03) discard; }',
+    '  gl_FragColor = vec4(uCol.rgb * a, a); }'].join('\n');
+  var wmCv = document.getElementById('wordmark'), progQ = null, UQ = {}, wmN = 0;
   function drawWordmark() {
-    if (!progQ || !wmCv || !wmCv.width || !wmCv.height) return;
+    var S = window.ldbWM; if (!progQ || !S || !S.n) return;
     var hr = cv.getBoundingClientRect(), wr = wmCv.getBoundingClientRect(); if (!hr.width || !hr.height) return;
     gl.useProgram(progQ);
-    gl.bindTexture(gl.TEXTURE_2D, wmTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wmCv); } catch (e) { return; }
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.bindBuffer(gl.ARRAY_BUFFER, B.wm);
+    if (wmN !== S.buf.length) { gl.bufferData(gl.ARRAY_BUFFER, S.buf, gl.DYNAMIC_DRAW); wmN = S.buf.length; } else gl.bufferSubData(gl.ARRAY_BUFFER, 0, S.buf);
+    var l = gl.getAttribLocation(progQ, 'aP'); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, 4, gl.FLOAT, false, 0, 0);
     gl.uniform4f(UQ.uRect, (wr.left - hr.left) / hr.width * 2 - 1, 1 - (wr.top - hr.top) / hr.height * 2, (wr.right - hr.left) / hr.width * 2 - 1, 1 - (wr.bottom - hr.top) / hr.height * 2);
-    gl.uniform1i(UQ.uTex, 0);
-    bindAttr(progQ, 'aQ', B.quad, 2, gl.FLOAT, false);
+    gl.uniform2f(UQ.uWH, S.W, S.H); gl.uniform1f(UQ.uDpr, cv.width / hr.width); gl.uniform1f(UQ.uG, S.g); gl.uniform1f(UQ.uBlur, S.blur);
     gl.depthMask(false); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    // out of focus
+    gl.uniform1f(UQ.uMode, 0); if (S.lt) gl.uniform4f(UQ.uCol, 160 / 255, 74 / 255, 82 / 255, 0.5); else gl.uniform4f(UQ.uCol, 1, 186 / 255, 192 / 255, 0.42);
+    gl.drawArrays(gl.POINTS, 0, S.n);
+    // in focus near the cursor and along the sweep
+    gl.uniform1f(UQ.uMode, 1); if (S.lt) gl.uniform4f(UQ.uCol, 122 / 255, 40 / 255, 48 / 255, 1); else gl.uniform4f(UQ.uCol, 1, 226 / 255, 228 / 255, 1);
+    gl.drawArrays(gl.POINTS, 0, S.n);
+    gl.disableVertexAttribArray(l);
   }
 
   var mode, progMesh, progDots, U = {}, UD = {}, W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), mobile = false, B = {}, D = null;
@@ -171,11 +182,8 @@
       uniforms(progDots, ['uRot', 'uBeat', 'uAspect', 'uScale', 'uOffY', 'uLight', 'uTime', 'uPx'], UD);
     }
     if (wmCv) try {
-      progQ = program(QVS, QFS); uniforms(progQ, ['uRect', 'uTex'], UQ); B.quad = buf(new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]));
-      wmTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, wmTex);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      wmCv.classList.add('ingl'); addEventListener('wordmarkdraw', req);
+      progQ = program(QVS, QFS); uniforms(progQ, ['uRect', 'uWH', 'uDpr', 'uG', 'uBlur', 'uMode', 'uCol'], UQ); B.wm = gl.createBuffer();
+      wmCv.classList.add('ingl'); addEventListener('wordmarkdraw', req); dispatchEvent(new Event('wordmarkgl'));
     } catch (e) { progQ = null; }
     resize(); cv.classList.add('on'); start();
   }

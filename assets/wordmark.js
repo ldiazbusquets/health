@@ -26,6 +26,15 @@
     for (var i = 0; i < P.length; i++) { var p = P[i], dx = p.x - mx, dy = p.y - my, d2 = dx * dx + dy * dy;
       if (d2 < R * R) { var dd = Math.sqrt(d2) || 1, f = (1 - dd / R) * 7; p.vx += dx / dd * f; p.vy += dy / dd * f - .4; }
       p.vx += (p.ox - p.x) * .045; p.vy += (p.oy - p.y) * .045; p.vx *= .84; p.vy *= .84; p.x += p.vx; p.y += p.vy; }
+    /* inside the heart's WebGL canvas (so the heart always covers it): hand over the particles, the GPU draws them */
+    if (cv.classList.contains('ingl')) {
+      var n = P.length, A = window.ldbWM && window.ldbWM.buf.length >= n * 4 ? window.ldbWM.buf : new Float32Array(Math.max(4, n * 4));
+      for (var c = 0; c < n; c++) { var u = P[c], fu = Math.max(0, 1 - Math.abs(u.ox - (mx > -999 ? mx : sweep)) / (W * .16)), mv = Math.min(1, Math.abs(u.vx) + Math.abs(u.vy));
+        A[c * 4] = u.x; A[c * 4 + 1] = u.y; A[c * 4 + 2] = u.s; A[c * 4 + 3] = Math.min(.95, fu * .8 + mv * .9) * Math.min(1, t / 1.2); }
+      window.ldbWM = { n: n, buf: A, W: W, H: H, g: g, blur: Math.max(2, 9 - t * 3), lt: LT, cv: cv };
+      if (reduce) dispatchEvent(new Event('wordmarkdraw'));
+      requestAnimationFrame(frame); return;
+    }
     /* blurred layer: the letters out of focus */
     if (bl.width !== cv.width || bl.height !== cv.height) { bl.width = cv.width; bl.height = cv.height; }
     bx.setTransform(dpr, 0, 0, dpr, 0, 0); bx.clearRect(0, 0, W, H); bx.fillStyle = LT ? 'rgba(160,74,82,.5)' : 'rgba(255,186,192,.42)';
@@ -36,7 +45,6 @@
     for (var b = 0; b < P.length; b++) { var r = P[b], fx = Math.max(0, 1 - Math.abs(r.ox - (mx > -999 ? mx : sweep)) / (W * .16)), moving = Math.min(1, Math.abs(r.vx) + Math.abs(r.vy));
       var al = Math.min(.95, fx * .8 + moving * .9) * Math.min(1, t / 1.2); if (al < .03) continue;
       x.fillStyle = (LT ? 'rgba(122,40,48,' : 'rgba(255,226,228,') + al.toFixed(2) + ')'; x.fillRect(r.x, r.y, g * r.s, g * r.s); }
-    if (!on || reduce) dispatchEvent(new Event('wordmarkdraw'));
     requestAnimationFrame(frame);
   }
   var hero = document.querySelector('.hero') || cv.parentNode;
@@ -44,7 +52,7 @@
   hero.addEventListener('pointerleave', function () { mx = -9999; my = -9999; });
   var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(build, 150); });
   function still() { P.forEach(function (p) { p.x = p.ox; p.y = p.oy; }); on = true; t0 = performance.now() - 5000; frame(performance.now()); on = false; }
-  function start() { build(); if (reduce) { still(); addEventListener('themechange', still); return; }
+  function start() { build(); if (reduce) { still(); addEventListener('themechange', still); addEventListener('wordmarkgl', still); return; }
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !on) { on = true; requestAnimationFrame(frame); } if (!v) on = false; }).observe(cv);
     else { on = true; requestAnimationFrame(frame); } }
   if (document.fonts && document.fonts.load) document.fonts.load('500 100px Manrope').then(start, start); else start();
