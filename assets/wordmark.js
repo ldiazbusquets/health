@@ -39,9 +39,8 @@
     if (bl.width !== cv.width || bl.height !== cv.height) { bl.width = cv.width; bl.height = cv.height; }
     bx.setTransform(dpr, 0, 0, dpr, 0, 0); bx.clearRect(0, 0, W, H); bx.fillStyle = LT ? 'rgba(160,74,82,.5)' : 'rgba(255,186,192,.42)';
     for (var a = 0; a < P.length; a++) { var q = P[a]; bx.fillRect(q.x, q.y, g, g); }
-    x.setTransform(1, 0, 0, 1, 0, 0); x.filter = 'blur(' + (Math.max(2, 9 - t * 3) * dpr).toFixed(1) + 'px)'; x.drawImage(bl, 0, 0); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = .55; x.drawImage(bl, 0, 0); x.globalAlpha = 1; x.setTransform(dpr, 0, 0, dpr, 0, 0);
     /* sharp layer: in focus near the cursor and along a slow sweep */
-    x.filter = 'none';
     for (var b = 0; b < P.length; b++) { var r = P[b], fx = Math.max(0, 1 - Math.abs(r.ox - (mx > -999 ? mx : sweep)) / (W * .16)), moving = Math.min(1, Math.abs(r.vx) + Math.abs(r.vy));
       var al = Math.min(.95, fx * .8 + moving * .9) * Math.min(1, t / 1.2); if (al < .03) continue;
       x.fillStyle = (LT ? 'rgba(122,40,48,' : 'rgba(255,226,228,') + al.toFixed(2) + ')'; x.fillRect(r.x, r.y, g * r.s, g * r.s); }
