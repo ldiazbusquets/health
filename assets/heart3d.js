@@ -137,9 +137,9 @@
   var QVS = ['attribute vec4 aP; uniform vec4 uRect; uniform vec2 uWH; uniform float uDpr, uG; uniform mediump float uBlur, uMode; varying mediump float vA, vS;',
     'void main() { vA = fract(aP.z); vS = aP.w; gl_Position = vec4(mix(uRect.x, uRect.z, aP.x / uWH.x), mix(uRect.y, uRect.w, aP.y / uWH.y), 0.99, 1.0);',
     '  gl_PointSize = uMode < 0.5 ? (uG + uBlur * 7.0) * uDpr : max(1.0, uG * floor(aP.z) / 100.0 * uDpr); }'].join('\n');
-  var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur; varying float vA, vS;',
+  var QFS = ['precision mediump float; uniform vec4 uCol; uniform float uMode, uBlur, uG, uGap; varying float vA, vS;',
     'void main() { float a;',
-    '  if (uMode < 0.5) { vec2 d = gl_PointCoord - 0.5; a = uCol.a * vA * exp(-dot(d, d) * 18.0) * clamp(2.6 / uBlur, 0.35, 1.0); if (a < 0.002) discard; }',
+    '  if (uMode < 0.5) { vec2 d = gl_PointCoord - 0.5; float sz = (uG + uBlur * 7.0) / uGap; a = uCol.a * 0.55 * vA * exp(-dot(d, d) * 18.0) / max(1.0, sz * sz * 0.17); if (a < 0.002) discard; }',
     '  else { a = vS; if (a < 0.03) discard; }',
     '  gl_FragColor = vec4(uCol.rgb * a, a); }'].join('\n');
   var wmCv = document.getElementById('wordmark'), progQ = null, UQ = {}, wmN = 0;
@@ -151,7 +151,7 @@
     if (wmN !== S.buf.length) { gl.bufferData(gl.ARRAY_BUFFER, S.buf, gl.DYNAMIC_DRAW); wmN = S.buf.length; } else gl.bufferSubData(gl.ARRAY_BUFFER, 0, S.buf);
     var l = gl.getAttribLocation(progQ, 'aP'); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, 4, gl.FLOAT, false, 0, 0);
     gl.uniform4f(UQ.uRect, (wr.left - hr.left) / hr.width * 2 - 1, 1 - (wr.top - hr.top) / hr.height * 2, (wr.right - hr.left) / hr.width * 2 - 1, 1 - (wr.bottom - hr.top) / hr.height * 2);
-    gl.uniform2f(UQ.uWH, S.W, S.H); gl.uniform1f(UQ.uDpr, cv.width / hr.width); gl.uniform1f(UQ.uG, S.g); gl.uniform1f(UQ.uBlur, S.blur);
+    gl.uniform2f(UQ.uWH, S.W, S.H); gl.uniform1f(UQ.uDpr, cv.width / hr.width); gl.uniform1f(UQ.uG, S.g); gl.uniform1f(UQ.uBlur, S.blur); gl.uniform1f(UQ.uGap, S.gap || 4);
     gl.depthMask(false); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     // out of focus
     gl.uniform1f(UQ.uMode, 0); if (S.lt) gl.uniform4f(UQ.uCol, 160 / 255, 74 / 255, 82 / 255, 0.5); else gl.uniform4f(UQ.uCol, 1, 186 / 255, 192 / 255, 0.42);
@@ -182,7 +182,7 @@
       uniforms(progDots, ['uRot', 'uBeat', 'uAspect', 'uScale', 'uOffY', 'uLight', 'uTime', 'uPx'], UD);
     }
     if (wmCv) try {
-      progQ = program(QVS, QFS); uniforms(progQ, ['uRect', 'uWH', 'uDpr', 'uG', 'uBlur', 'uMode', 'uCol'], UQ); B.wm = gl.createBuffer();
+      progQ = program(QVS, QFS); uniforms(progQ, ['uRect', 'uWH', 'uDpr', 'uG', 'uGap', 'uBlur', 'uMode', 'uCol'], UQ); B.wm = gl.createBuffer();
       wmCv.classList.add('ingl'); addEventListener('wordmarkdraw', req); dispatchEvent(new Event('wordmarkgl'));
     } catch (e) { progQ = null; }
     resize(); cv.classList.add('on'); start();

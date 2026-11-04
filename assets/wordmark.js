@@ -33,7 +33,7 @@
         /* particles pushed out of the word's box fade away instead of being cut off in a hard line */
         var out = Math.max(0, -u.y, u.y - H, -u.x, u.x - W), fd = Math.max(0, 1 - out / 36);
         A[c * 4] = u.x; A[c * 4 + 1] = u.y; A[c * 4 + 2] = Math.floor(u.s * 100) + Math.min(.99, fd); A[c * 4 + 3] = Math.min(.9, fu * .75 + mv * .6) * Math.min(1, t / 1.2) * fd; }
-      window.ldbWM = { n: n, buf: A, W: W, H: H, g: g, blur: Math.max(2, 9 - t * 3), lt: LT, cv: cv };
+      window.ldbWM = { n: n, buf: A, W: W, H: H, g: g, gap: Math.max(3, Math.round(W / 300)), blur: Math.max(2, 9 - t * 3), lt: LT, cv: cv };
       if (reduce) dispatchEvent(new Event('wordmarkdraw'));
       requestAnimationFrame(frame); return;
     }
