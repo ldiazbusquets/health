@@ -26,4 +26,23 @@
   // colours that canvases read (they follow the theme)
   window.ldbColors = function () { var cs = getComputedStyle(document.documentElement); var g = function (n) { return cs.getPropertyValue(n).trim(); };
     return { ink: g('--ink'), t2: g('--t2'), t3: g('--t3'), ln: g('--ln'), ln2: g('--ln2'), acc: g('--acc'), acc2: g('--acc2'), green: g('--green'), rose: g('--rose'), blue: g('--blue'), bg: g('--bg'), s1: g('--s1'), lt: document.documentElement.classList.contains('lt') }; };
+
+  // footer wordmark: letters come into focus near the cursor, and a slow wave runs through them otherwise
+  var wm = document.getElementById('wm');
+  if (wm) {
+    var L = [].slice.call(wm.querySelectorAll('span')), wx = -1, w0 = performance.now(), won = false, wred = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    wm.addEventListener('pointermove', function (e) { wx = e.clientX; });
+    wm.addEventListener('pointerleave', function () { wx = -1; });
+    var wf = function (now) {
+      if (!won) return; var t = (now - w0) / 1000;
+      L.forEach(function (s, i) {
+        var r = s.getBoundingClientRect(), c = r.left + r.width / 2, b;
+        if (wx >= 0) b = Math.min(14, Math.abs(wx - c) / 40);
+        else { var ph = (t * .45 - i / L.length) % 1.6; b = ph > 0 && ph < .45 ? 14 * Math.sin(ph / .45 * Math.PI) : 0; }
+        s.style.filter = 'blur(' + b.toFixed(1) + 'px)';
+      });
+      requestAnimationFrame(wf);
+    };
+    if (!wred && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { var v = es[0].isIntersecting; if (v && !won) { won = true; requestAnimationFrame(wf); } if (!v) won = false; }).observe(wm);
+  }
 })();

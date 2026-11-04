@@ -1,4 +1,4 @@
-/* Hero background layer: the dot-matrix wordmark, a soft glow on each beat and an ECG trace in time
+/* Hero background layer: a soft glow on each beat and an ECG trace in time
    with it. The anatomical heart itself is drawn by heart3d.js on a WebGL canvas above this one. */
 (function () {
   var cv = document.getElementById('heart'); if (!cv) return;
@@ -6,25 +6,9 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PERIOD = 0.92; // seconds per beat (about 65 per minute)
 
-  // dot-matrix wordmark
-  var dots = [];
-  function buildWordmark() {
-    dots = [];
-    var text = 'LDB HEALTH', o = document.createElement('canvas'), c = o.getContext('2d');
-    var cols = mobile ? 0 : Math.floor(W / 7); if (!cols) return;
-    var gw = cols, gh = Math.floor(gw * 0.22); o.width = gw; o.height = gh;
-    c.fillStyle = '#000'; c.font = '600 ' + Math.floor(gh * 0.92) + 'px Manrope, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    var fit = c.measureText(text).width; if (fit > gw * 0.86) c.font = '600 ' + Math.floor(gh * 0.92 * gw * 0.86 / fit) + 'px Manrope, system-ui, sans-serif';
-    c.fillText(text, gw / 2, gh / 2 + gh * 0.04);
-    var d = c.getImageData(0, 0, gw, gh).data, step = W / gw, top = Math.max(84, H * 0.1);
-    for (var y = 0; y < gh; y++) for (var x = 0; x < gw; x++) if (d[(y * gw + x) * 4 + 3] > 120) dots.push([x * step + step / 2, top + y * step, Math.random()]);
-  }
-
   function resize() {
     var r = cv.getBoundingClientRect(); W = r.width; H = r.height; mobile = innerWidth <= 980;
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(buildWordmark); else buildWordmark();
-    buildWordmark();
   }
   addEventListener('resize', resize);
 
@@ -44,9 +28,6 @@
     var t = reduced ? 1.3 : (now - t0) / 1000, C = window.ldbColors ? window.ldbColors() : { lt: false };
     var lt = C.lt;
     ctx.clearRect(0, 0, W, H);
-    // wordmark
-    var wa = lt ? 'rgba(120,40,46,' : 'rgba(255,235,236,';
-    for (var i = 0; i < dots.length; i++) { var d = dots[i], tw = 0.07 + 0.05 * Math.sin(t * 1.3 + d[2] * 12); ctx.fillStyle = wa + tw.toFixed(3) + ')'; ctx.fillRect(d[0] - 1.3, d[1] - 1.3, 2.6, 2.6); }
 
     // heart
     mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
