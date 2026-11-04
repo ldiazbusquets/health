@@ -1,25 +1,10 @@
-/* Hero: a 3D particle heart that beats, an ECG trace in time with it, and the dot-matrix wordmark.
-   The heart is the classic implicit surface (x² + 9/4 z² + y² − 1)³ − x² y³ − 9/80 z² y³ = 0,
-   sampled by casting rays from its centre and finding where each ray leaves the surface. */
+/* Hero background layer: the dot-matrix wordmark, a soft glow on each beat and an ECG trace in time
+   with it. The anatomical heart itself is drawn by heart3d.js on a WebGL canvas above this one. */
 (function () {
   var cv = document.getElementById('heart'); if (!cv) return;
   var ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, mobile = false;
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PERIOD = 0.92; // seconds per beat (about 65 per minute)
-
-  function f(x, y, z) { var a = x * x + 2.25 * z * z + y * y - 1; return a * a * a - x * x * y * y * y - 0.1125 * z * z * y * y * y; }
-  var pts = [];
-  (function sample() {
-    var n = 4600, i = 0, guard = 0;
-    while (pts.length < n && guard++ < n * 4) {
-      var u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u);
-      var dx = s * Math.cos(th), dy = u, dz = s * Math.sin(th);
-      var lo = 0, hi = 1.7; if (f(dx * hi, dy * hi, dz * hi) < 0) continue;
-      for (i = 0; i < 26; i++) { var m = (lo + hi) / 2; if (f(dx * m, dy * m, dz * m) < 0) lo = m; else hi = m; }
-      var r = (lo + hi) / 2;
-      pts.push([dx * r, dy * r - 0.1, dz * r, Math.random()]);
-    }
-  })();
 
   // dot-matrix wordmark
   var dots = [];
@@ -65,22 +50,8 @@
 
     // heart
     mx += (tx - mx) * 0.04; my += (ty - my) * 0.04;
-    var phase = (t / PERIOD) % 1, sc = beat(phase);
+    var phase = (t / PERIOD) % 1, sc = 1 + (window.ldbBeat ? window.ldbBeat(phase) : 0);
     var cx = W / 2, cy = mobile ? H * 0.5 : H * 0.53, R = Math.min(W * (mobile ? 0.36 : 0.2), H * (mobile ? 0.34 : 0.3)) * sc;
-    var ay = Math.sin(t * 0.45) * 0.62 + mx * 0.7, ax = -0.18 + my * 0.3, ca = Math.cos(ay), sa = Math.sin(ay), cb = Math.cos(ax), sb = Math.sin(ax);
-    var front = lt ? [150, 30, 40] : [255, 225, 226], back = lt ? [190, 120, 125] : [200, 70, 78];
-    for (i = 0; i < pts.length; i++) {
-      var p = pts[i], x = p[0], y = p[1], z = p[2];
-      var x1 = x * ca + z * sa, z1 = -x * sa + z * ca;
-      var y1 = y * cb - z1 * sb, z2 = y * sb + z1 * cb;
-      var depth = (z2 + 1.4) / 2.8, persp = 1 / (1 + z2 * 0.18);
-      var sx = cx + x1 * R * persp, sy = cy - y1 * R * persp;
-      var k = Math.max(0, Math.min(1, depth)), a = 0.22 + 0.78 * k;
-      var flick = 0.85 + 0.15 * Math.sin(t * 2 + p[3] * 20);
-      var c0 = Math.round(back[0] + (front[0] - back[0]) * k), c1 = Math.round(back[1] + (front[1] - back[1]) * k), c2 = Math.round(back[2] + (front[2] - back[2]) * k);
-      ctx.fillStyle = 'rgba(' + c0 + ',' + c1 + ',' + c2 + ',' + (a * flick).toFixed(3) + ')';
-      var s = (0.9 + 1.7 * k) * persp; ctx.fillRect(sx - s / 2, sy - s / 2, s, s);
-    }
     // soft glow on the beat
     var glow = 0.1 + 0.25 * g(phase, .27, .06);
     var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.6);

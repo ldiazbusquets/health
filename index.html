@@ -46,7 +46,7 @@
 
 <main>
 <section class="hero" id="top" aria-label="Introduction">
-  <canvas id="heart" aria-hidden="true"></canvas>
+  <div class="hstage" role="img" aria-label="A beating anatomical heart: the ventricles, atria, aorta, pulmonary trunk and coronary vessels"><canvas id="heart" aria-hidden="true"></canvas><canvas id="heart3d" data-src="assets/model/heart.bin.gz" aria-hidden="true"></canvas></div>
   <div class="hcopy">
     <p class="k">AI in Healthcare · Luis Diaz Busquets</p>
     <h1><span>Medicine,</span><span>Measured</span><span>By Machines.</span></h1>
@@ -105,6 +105,7 @@
   <div>
     <p>The same questions run through finance and medicine: how much to trust a model, what an error costs, and who carries that cost. This site works through them for healthcare as part of the Applied AI minor at Bryant University.</p>
     <p>It is a sister site to the <a href="/lab/" style="color:var(--ink);text-decoration:underline;text-underline-offset:3px">LDB Lab</a>, which covers how machine learning works and how it is used in finance. Everything here runs in your browser; nothing you enter is sent anywhere.</p>
+    <p style="font-size:13.5px">The heart at the top of the page is real anatomy: the heart walls, coronary vessels, aorta and pulmonary vessels from <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/" rel="noopener" style="color:var(--ink);text-decoration:underline;text-underline-offset:3px">BodyParts3D</a>, © The Database Center for Life Science, used under <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener" style="color:var(--ink);text-decoration:underline;text-underline-offset:3px">CC BY 4.0</a> and adapted (parts extracted, vessels trimmed, geometry merged).</p>
     <div class="note"><b>Educational only.</b> These tools use made-up or illustrative numbers to explain ideas. They are not medical advice and say nothing about any real person's health.</div>
   </div>
 </div></section>
@@ -123,6 +124,7 @@
 </footer>
 
 <script src="assets/site.js"></script>
+<script src="assets/heart3d.js"></script>
 <script src="assets/heart.js"></script>
 <script>
 (function () {
