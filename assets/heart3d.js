@@ -132,6 +132,25 @@
   // the invisible depth pass: the solid heart hides the dots on its far side and inside the chambers
   var DEPTH_FS = 'precision mediump float; void main() { gl_FragColor = vec4(0.0); }';
 
+  // the LDB HEALTH wordmark (drawn by wordmark.js on its own canvas) is composited here, behind the heart:
+  // a flat quad at the back of the depth range, so the heart's silhouette always covers it
+  var QVS = 'attribute vec2 aQ; uniform vec4 uRect; varying vec2 vUv; void main() { vUv = vec2(aQ.x, 1.0 - aQ.y); gl_Position = vec4(mix(uRect.x, uRect.z, aQ.x), mix(uRect.w, uRect.y, aQ.y), 0.99, 1.0); }';
+  var QFS = 'precision mediump float; uniform sampler2D uTex; varying vec2 vUv; void main() { gl_FragColor = texture2D(uTex, vUv); }';
+  var wmCv = document.getElementById('wordmark'), progQ = null, UQ = {}, wmTex = null;
+  function drawWordmark() {
+    if (!progQ || !wmCv || !wmCv.width || !wmCv.height) return;
+    var hr = cv.getBoundingClientRect(), wr = wmCv.getBoundingClientRect(); if (!hr.width || !hr.height) return;
+    gl.useProgram(progQ);
+    gl.bindTexture(gl.TEXTURE_2D, wmTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wmCv); } catch (e) { return; }
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.uniform4f(UQ.uRect, (wr.left - hr.left) / hr.width * 2 - 1, 1 - (wr.top - hr.top) / hr.height * 2, (wr.right - hr.left) / hr.width * 2 - 1, 1 - (wr.bottom - hr.top) / hr.height * 2);
+    gl.uniform1i(UQ.uTex, 0);
+    bindAttr(progQ, 'aQ', B.quad, 2, gl.FLOAT, false);
+    gl.depthMask(false); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
   var mode, progMesh, progDots, U = {}, UD = {}, W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1), mobile = false, B = {}, D = null;
   function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
   function program(vs, fs) { var p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('link'); return p; }
@@ -151,6 +170,13 @@
       B.dpos = buf(D.pos); B.dnrm = buf(D.nrm); B.dgrp = buf(D.grp); B.drnd = buf(D.rnd);
       uniforms(progDots, ['uRot', 'uBeat', 'uAspect', 'uScale', 'uOffY', 'uLight', 'uTime', 'uPx'], UD);
     }
+    if (wmCv) try {
+      progQ = program(QVS, QFS); uniforms(progQ, ['uRect', 'uTex'], UQ); B.quad = buf(new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]));
+      wmTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, wmTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      wmCv.classList.add('ingl'); addEventListener('wordmarkdraw', req);
+    } catch (e) { progQ = null; }
     resize(); cv.classList.add('on'); start();
   }
   function resize() {
@@ -187,6 +213,7 @@
     if (mode === 'dots') { gl.colorMask(false, false, false, false); gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(2, 4); }
     gl.drawElements(gl.TRIANGLES, M.ni, gl.UNSIGNED_SHORT, 0);
     gl.colorMask(true, true, true, true); gl.disable(gl.POLYGON_OFFSET_FILL);
+    drawWordmark();
     if (mode === 'dots') {
       gl.useProgram(progDots); [3, 4, 5, 6].forEach(function () {});
       bindAttr(progDots, 'aPos', B.dpos, 3, gl.FLOAT, false); bindAttr(progDots, 'aNrm', B.dnrm, 3, gl.FLOAT, false); bindAttr(progDots, 'aGrp', B.dgrp, 1, gl.FLOAT, false); bindAttr(progDots, 'aRnd', B.drnd, 1, gl.FLOAT, false);

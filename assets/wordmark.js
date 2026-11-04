@@ -36,6 +36,7 @@
     for (var b = 0; b < P.length; b++) { var r = P[b], fx = Math.max(0, 1 - Math.abs(r.ox - (mx > -999 ? mx : sweep)) / (W * .16)), moving = Math.min(1, Math.abs(r.vx) + Math.abs(r.vy));
       var al = Math.min(.95, fx * .8 + moving * .9) * Math.min(1, t / 1.2); if (al < .03) continue;
       x.fillStyle = (LT ? 'rgba(122,40,48,' : 'rgba(255,226,228,') + al.toFixed(2) + ')'; x.fillRect(r.x, r.y, g * r.s, g * r.s); }
+    if (!on || reduce) dispatchEvent(new Event('wordmarkdraw'));
     requestAnimationFrame(frame);
   }
   var hero = document.querySelector('.hero') || cv.parentNode;

@@ -82,7 +82,8 @@ html.lt .tbtn { background: rgba(255,255,255,.5); border-color: rgba(60,20,24,.1
 .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 55% at 50% 40%, rgba(255,255,255,.08), transparent 70%); pointer-events: none; }
 html.lt .hero::after { background: radial-gradient(70% 55% at 50% 40%, rgba(255,255,255,.4), transparent 70%); }
 .hstage { position: absolute; inset: 0; z-index: 0; }
-#wordmark { position: absolute; left: 0; right: 0; top: clamp(70px, 9vh, 100px); width: 100%; height: clamp(130px, 19vw, 280px); display: block; }
+#wordmark { position: absolute; left: 0; right: 0; top: clamp(70px, 9vh, 100px); width: 100%; height: clamp(130px, 19vw, 280px); display: block; transition: opacity 1.2s ease; }
+#wordmark.ingl { opacity: 0; }   /* drawn inside the heart's WebGL canvas instead, so the heart always covers it */
 #heart, #heart3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 #heart3d { opacity: 0; transition: opacity 1.2s ease; } #heart3d.on { opacity: 1; }
 .hcopy { position: absolute; z-index: 2; left: var(--g); bottom: clamp(48px, 8vh, 80px); max-width: 440px; }
